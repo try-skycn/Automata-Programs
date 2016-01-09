@@ -16,9 +16,11 @@ class turing_machine {
 private:
 	struct transition {
 		int state;
+		string state_name;
 		char symbol;
 		short move;
 	};
+	vector<string> name;
 	list<char> tape;
 	list<char>::iterator pointer;
 	vector< map<char, transition> > delta;
@@ -27,10 +29,14 @@ private:
 	int N;
 public:
 	void read(istream &is) {
+		map<string, int> state_index;
 		is >> N;
 		delta.resize(N);
 		string buff;
 		for (int i = 0; i < N; ++i) {
+			is >> buff;
+			state_index[buff] = i;
+			name.push_back(buff);
 			int S;
 			is >> S;
 			is_final.push_back(S == -1);
@@ -39,11 +45,16 @@ public:
 				transition T;
 
 				is >> buff; input_symbol = buff[0];
-				is >> T.state;
+				is >> T.state_name;
 				is >> buff; T.symbol = buff[0];
 				is >> buff;
 				T.move = (buff[0] == 'L' ? -1 : (buff[0] == 'R' ? 1 : 0));
 				delta[i][input_symbol] = T;
+			}
+		}
+		for (int i = 0; i < N; ++i) {
+			for (map<char, transition>::iterator it = delta[i].begin(); it != delta[i].end(); ++it) {
+				it->second.state = state_index[it->second.state_name];
 			}
 		}
 		is >> buff;
@@ -51,7 +62,7 @@ public:
 		for (int i = 0; i < len; ++i) {
 			tape.push_back(buff[i]);
 		}
-		is >> current_state;
+		is >> buff; current_state = state_index[buff];
 		int pointer_pos;
 		is >> pointer_pos;
 		pointer = tape.begin();
@@ -82,7 +93,7 @@ public:
 		os << endl;
 		for (list<char>::iterator it = tape.begin(); it != tape.end(); ++it) {
 			if (it == pointer) {
-				os << "q:" << current_state;
+				os << "q:" << name[current_state];
 				break;
 			} else {
 				os << ' ';
