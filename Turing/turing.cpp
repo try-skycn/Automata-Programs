@@ -11,6 +11,17 @@
 using namespace std;
 
 int sleep_time = 10000;
+bool history_option = false;
+
+void clear_screen() {
+	if (history_option) {
+		system("clear");
+	} else {
+		for (int i = 0; i < 3; ++i) {
+			cout << "\e[1A" << "\e[K";
+		}
+	}
+}
 
 class turing_machine {
 private:
@@ -73,7 +84,6 @@ public:
 		tape.push_back('_');
 	}
 	void print_current_state(ostream &os) {
-		system("clear");
 		for (list<char>::iterator it = tape.begin(); it != tape.end(); ++it) {
 			if (*it != '_') {
 				os << *it;
@@ -101,6 +111,7 @@ public:
 		}
 		os << endl;
 		usleep(sleep_time);
+		clear_screen();
 	}
 	bool run_one_step() {
 		char input_symbol = *pointer;
@@ -147,8 +158,16 @@ int string_to_int(char *str) {
 }
 
 int main(int argc, char *argv[]) {
-	if (argc > 1) {
-		sleep_time = string_to_int(argv[1]);
+	char opt_c;
+	while ( (opt_c = getopt(argc, argv, "t:h")) != -1) {
+		switch (opt_c) {
+		case 't':
+			sscanf(optarg, "%d", &sleep_time);
+			break;
+		case 'h':
+			history_option = true;
+			break;
+		}
 	}
 	turing_machine M;
 	M.read(cin);
