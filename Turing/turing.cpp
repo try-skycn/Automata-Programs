@@ -111,7 +111,6 @@ public:
 		}
 		os << endl;
 		usleep(sleep_time);
-		clear_screen();
 	}
 	bool run_one_step() {
 		char input_symbol = *pointer;
@@ -137,12 +136,14 @@ public:
 	}
 	void run(ostream &os) {
 		print_current_state(os);
+		clear_screen();
 		bool result = true;
 		while ((result = run_one_step())) {
 			if (is_final[current_state]) {
 				break;
 			}
 			print_current_state(os);
+			clear_screen();
 		}
 		print_current_state(os);
 		os << (result ? "Accept" : "Reject") << endl;
